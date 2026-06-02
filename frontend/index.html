@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,108 +11,99 @@
 
 <body>
 
-    <header>
-        <h1>KubeGuardian AI</h1>
-        <p>Autonomous Kubernetes Threat Detection Platform</p>
-    </header>
+<header>
+    <h1>KubeGuardian AI</h1>
+    <p>Autonomous Kubernetes Threat Detection Platform</p>
+</header>
 
-    <div class="container">
-
-        <div class="card">
-
-            <h2>Threat Prediction</h2>
-
-            <input
-                type="text"
-                id="process"
-                placeholder="Process Name"
-            >
-
-            <input
-                type="number"
-                id="cpu"
-                placeholder="CPU Usage"
-            >
-
-            <input
-                type="number"
-                id="memory"
-                placeholder="Memory Usage"
-            >
-
-            <button onclick="predictThreat()">
-                Predict Threat
-            </button>
-
-        </div>
-
-        <div class="card">
-
-            <h2>Prediction Result</h2>
-
-            <div id="result">
-                Waiting for prediction...
-            </div>
-
-        </div>
-
-    </div>
+<div class="container">
 
     <div class="stats">
 
-    <div class="stat-card">
-        <h3>Total Threats</h3>
-        <h1>15</h1>
+        <div class="stat-card">
+            <h3>Total Predictions</h3>
+            <h1 id="totalThreats">0</h1>
+        </div>
+
+        <div class="stat-card">
+            <h3>Critical Threats</h3>
+            <h1 id="criticalThreats">0</h1>
+        </div>
+
+        <div class="stat-card">
+            <h3>Low Threats</h3>
+            <h1 id="lowThreats">0</h1>
+        </div>
+
     </div>
 
-    <div class="stat-card">
-        <h3>Malicious</h3>
-        <h1>8</h1>
+    <div class="card">
+
+        <h2>Threat Prediction</h2>
+
+        <input
+            type="text"
+            id="process"
+            placeholder="Process Name"
+        >
+
+        <input
+            type="number"
+            id="cpu"
+            placeholder="CPU Usage"
+        >
+
+        <input
+            type="number"
+            id="memory"
+            placeholder="Memory Usage"
+        >
+
+        <button onclick="predictThreat()">
+            Predict Threat
+        </button>
+
     </div>
 
-    <div class="stat-card">
-        <h3>Suspicious</h3>
-        <h1>4</h1>
+    <div class="card">
+
+        <h2>Prediction Result</h2>
+
+        <div id="result">
+            Waiting for prediction...
+        </div>
+
     </div>
 
-    <div class="stat-card">
-        <h3>Normal</h3>
-        <h1>3</h1>
+    <div class="card">
+
+        <h2>Threat History</h2>
+
+        <table id="historyTable">
+
+            <thead>
+
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Process</th>
+                    <th>Prediction</th>
+                    <th>Severity</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+            </tbody>
+
+        </table>
+
     </div>
-
-</div>
-
-<div class="card">
-
-    <h2>Recent Threats</h2>
-
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Process</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            <tr>
-                <td>1</td>
-                <td>xmrig</td>
-                <td>Malicious</td>
-            </tr>
-
-            <tr>
-                <td>2</td>
-                <td>bash</td>
-                <td>Malicious</td>
-            </tr>
-        </tbody>
-    </table>
 
 </div>
 
 <script src="app.js"></script>
 
 </body>
+
 </html>

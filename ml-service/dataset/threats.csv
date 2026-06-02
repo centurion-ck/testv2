@@ -1,0 +1,11 @@
+process_name,cpu_usage,memory_usage,label
+xmrig,95,800,1
+crypto,92,700,1
+miner,90,650,1
+bash,88,600,1
+netcat,85,550,1
+python,20,200,0
+java,30,300,0
+nginx,15,100,0
+apache,25,250,0
+mysql,35,350,0
