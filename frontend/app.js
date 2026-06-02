@@ -2,72 +2,116 @@ const API = "/api";
 
 async function loadStats() {
 
-    const res = await fetch(`${API}/stats`);
-    const data = await res.json();
+    try {
 
-    document.getElementById("totalThreats").innerText =
-        data.total || 0;
+        const res = await fetch(`${API}/stats`);
+        const data = await res.json();
 
-    document.getElementById("criticalThreats").innerText =
-        data.critical || 0;
+        document.getElementById("totalThreats").innerText =
+            data.total || 0;
 
-    document.getElementById("lowThreats").innerText =
-        data.low || 0;
+        document.getElementById("criticalThreats").innerText =
+            data.critical || 0;
+
+        document.getElementById("lowThreats").innerText =
+            data.low || 0;
+
+    } catch (e) {
+
+        console.log(e);
+
+    }
 }
 
 async function loadHistory() {
 
-    const res = await fetch(`${API}/history`);
+    try {
 
-    const data = await res.json();
+        const res = await fetch(`${API}/history`);
+        const data = await res.json();
 
-    const tbody =
-        document.querySelector("#historyTable tbody");
+        const tbody =
+            document.querySelector("#historyTable tbody");
 
-    tbody.innerHTML = "";
+        tbody.innerHTML = "";
 
-    data.reverse().forEach(item => {
+        data.reverse().forEach(item => {
 
-        tbody.innerHTML += `
-        <tr>
-            <td>${item.timestamp}</td>
-            <td>${item.process_name}</td>
-            <td>${item.prediction}</td>
-            <td>${item.severity}</td>
-        </tr>
-        `;
-    });
+            const severityColor =
+                item.severity === "Critical"
+                    ? "#ef4444"
+                    : "#22c55e";
+
+            tbody.innerHTML += `
+            <tr>
+                <td>${item.timestamp}</td>
+                <td>${item.process_name}</td>
+                <td>${item.prediction}</td>
+                <td style="color:${severityColor};font-weight:bold;">
+                    ${item.severity}
+                </td>
+            </tr>
+            `;
+        });
+
+    } catch (e) {
+
+        console.log(e);
+
+    }
 }
 
 async function loadPods() {
 
-    const res = await fetch(`${API}/pods-json`);
-
-    const data = await res.json();
-
-    let pods = [];
-
     try {
-        pods = JSON.parse(data).items;
-    } catch {
-        pods = [];
+
+        const res = await fetch(`${API}/pods-json`);
+
+        const data = await res.json();
+
+        let pods = [];
+
+        try {
+
+            pods = JSON.parse(data).items;
+
+        } catch {
+
+            pods = [];
+
+        }
+
+        const table =
+            document.getElementById("podsTable");
+
+        table.innerHTML = "";
+
+        document.getElementById("podCount").innerText =
+            pods.length;
+
+        pods.forEach(pod => {
+
+            const statusColor =
+                pod.status.phase === "Running"
+                    ? "#22c55e"
+                    : "#ef4444";
+
+            table.innerHTML += `
+            <tr>
+                <td>${pod.metadata.name}</td>
+                <td>${pod.metadata.namespace}</td>
+                <td style="color:${statusColor};font-weight:bold;">
+                    ${pod.status.phase}
+                </td>
+            </tr>
+            `;
+        });
+
+    } catch (e) {
+
+        console.log(e);
+
     }
-
-    const table =
-        document.getElementById("podsTable");
-
-    table.innerHTML = "";
-
-    pods.forEach(pod => {
-
-        table.innerHTML += `
-        <tr>
-            <td>${pod.metadata.name}</td>
-            <td>${pod.metadata.namespace}</td>
-            <td>${pod.status.phase}</td>
-        </tr>
-        `;
-    });
 }
 
 async function predictThreat() {
@@ -90,7 +134,7 @@ async function predictThreat() {
         {
             method: "POST",
             headers: {
-                "Content-Type":"application/json"
+                "Content-Type": "application/json"
             },
             body: JSON.stringify({
                 process_name,
@@ -103,29 +147,61 @@ async function predictThreat() {
     const result =
         await res.json();
 
+    let badge =
+        result.severity === "Critical"
+        ?
+        `<span style="
+            background:#ef4444;
+            color:white;
+            padding:8px 16px;
+            border-radius:8px;
+            font-weight:bold;
+        ">
+        CRITICAL
+        </span>`
+        :
+        `<span style="
+            background:#22c55e;
+            color:white;
+            padding:8px 16px;
+            border-radius:8px;
+            font-weight:bold;
+        ">
+        LOW
+        </span>`;
+
     document.getElementById("result")
         .innerHTML = `
-        <h3>${result.prediction}</h3>
+
+        <h2>
+            ${badge}
+        </h2>
 
         <p>
-        Threat Type:
+        <b>Prediction:</b>
+        ${result.prediction}
+        </p>
+
+        <p>
+        <b>Threat Type:</b>
         ${result.threat_type}
         </p>
 
         <p>
-        Severity:
+        <b>Severity:</b>
         ${result.severity}
         </p>
 
         <p>
-        Confidence:
+        <b>Confidence:</b>
         ${result.score}
         </p>
 
         <p>
-        Recommendation:
+        <b>Recommendation:</b>
         ${result.recommendation}
         </p>
+
     `;
 
     loadStats();
@@ -136,23 +212,30 @@ async function restartPod() {
 
     const podName =
         prompt(
-            "Enter pod name to restart"
+            "Enter Pod Name"
         );
 
-    if(!podName) return;
+    if (!podName) return;
+
+    document.getElementById("result")
+        .innerHTML = `
+        <h3 style="color:#f59e0b;">
+        Triggering Auto Remediation...
+        </h3>
+        `;
 
     const res = await fetch(
         `${API}/restart-pod`,
         {
-            method:"POST",
-            headers:{
+            method: "POST",
+            headers: {
                 "Content-Type":
-                "application/json"
+                    "application/json"
             },
             body: JSON.stringify({
                 pod_name: podName,
                 namespace:
-                "kubeguardian"
+                    "kubeguardian"
             })
         }
     );
@@ -160,11 +243,16 @@ async function restartPod() {
     const result =
         await res.json();
 
-    alert(
-        "Remediation Completed"
-    );
+    document.getElementById("result")
+        .innerHTML = `
+        <h2 style="color:#22c55e;">
+        Auto Remediation Completed
+        </h2>
 
-    console.log(result);
+        <pre>
+${JSON.stringify(result, null, 2)}
+        </pre>
+        `;
 
     loadPods();
 }
@@ -179,7 +267,10 @@ loadStats();
 loadHistory();
 loadPods();
 
-setInterval(
-    loadPods,
-    15000
-);
+setInterval(() => {
+
+    loadStats();
+    loadHistory();
+    loadPods();
+
+}, 10000);
