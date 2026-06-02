@@ -1,40 +1,14 @@
 from fastapi import APIRouter
 import subprocess
 
-router = APIRouter(
-    prefix="/api",
-    tags=["Metrics"]
-)
+router = APIRouter(prefix="/api")
 
 @router.get("/cluster-metrics")
 def cluster_metrics():
 
     try:
 
-        nodes = subprocess.check_output(
-            ["kubectl", "get", "nodes", "--no-headers"]
-        ).decode()
-
-        node_count = len(
-            nodes.strip().split("\n")
-        )
-
-        pods = subprocess.check_output(
-            [
-                "kubectl",
-                "get",
-                "pods",
-                "-n",
-                "kubeguardian",
-                "--no-headers"
-            ]
-        ).decode()
-
-        pod_count = len(
-            pods.strip().split("\n")
-        )
-
-        top = subprocess.check_output(
+        output = subprocess.check_output(
             [
                 "kubectl",
                 "top",
@@ -46,38 +20,39 @@ def cluster_metrics():
         ).decode()
 
         cpu_total = 0
-        memory_total = 0
+        mem_total = 0
+        pod_count = 0
 
-        for line in top.splitlines():
+        for line in output.splitlines():
 
             parts = line.split()
 
-            if len(parts) >= 3:
+            cpu = parts[1]
+            mem = parts[2]
 
-                cpu = parts[1]
-                memory = parts[2]
+            cpu_total += int(
+                cpu.replace("m","")
+            )
 
-                cpu_total += int(
-                    cpu.replace("m", "")
-                )
+            mem_total += int(
+                mem.replace("Mi","")
+            )
 
-                memory_total += int(
-                    memory.replace("Mi", "")
-                )
+            pod_count += 1
+
+        health = 100
+
+        if cpu_total > 500:
+            health = 80
+
+        if cpu_total > 1000:
+            health = 60
 
         return {
-
-            "cluster_health": 98,
-
-            "nodes": node_count,
-
-            "pods": pod_count,
-
-            "cpu_usage_millicores":
-                cpu_total,
-
-            "memory_usage_mib":
-                memory_total
+            "health_score": health,
+            "running_pods": pod_count,
+            "cpu_millicores": cpu_total,
+            "memory_mib": mem_total
         }
 
     except Exception as e:
