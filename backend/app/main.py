@@ -8,6 +8,7 @@ from app.routes.remediation import router as remediation_router
 from app.routes.cluster import router as cluster_router
 from app.routes.metrics import router as metrics_router
 
+
 app = FastAPI(
     title="KubeGuardian AI",
     version="1.0"

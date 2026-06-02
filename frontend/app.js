@@ -17,19 +17,29 @@ async function loadClusterMetrics() {
             await res.json();
 
         document.getElementById(
-            "clusterHealth"
+            "healthScore"
         ).innerText =
-            (data.cluster_health || 0) + "%";
+            (data.health_score || 0) + "%";
 
         document.getElementById(
-            "nodeCount"
+            "podCount"
         ).innerText =
-            data.nodes || 0;
+            data.running_pods || 0;
+
+        document.getElementById(
+            "cpuUsage"
+        ).innerText =
+            (data.cpu_millicores || 0) + "m";
+
+        document.getElementById(
+            "memoryUsage"
+        ).innerText =
+            (data.memory_mib || 0) + "Mi";
 
     } catch (e) {
 
         console.log(
-            "Cluster Metrics Error:",
+            "Metrics Error",
             e
         );
 
@@ -37,7 +47,7 @@ async function loadClusterMetrics() {
 }
 
 /* ==========================
-   Stats
+   Threat Stats
 ========================== */
 
 async function loadStats() {
@@ -70,7 +80,7 @@ async function loadStats() {
     } catch (e) {
 
         console.log(
-            "Stats Error:",
+            "Stats Error",
             e
         );
 
@@ -102,8 +112,9 @@ async function loadHistory() {
 
         data.reverse().forEach(item => {
 
-            const severityColor =
-                item.severity === "Critical"
+            const color =
+                item.severity ===
+                "Critical"
                     ? "#ef4444"
                     : "#22c55e";
 
@@ -112,12 +123,7 @@ async function loadHistory() {
                 <td>${item.timestamp}</td>
                 <td>${item.process_name}</td>
                 <td>${item.prediction}</td>
-                <td
-                    style="
-                        color:${severityColor};
-                        font-weight:bold;
-                    "
-                >
+                <td style="color:${color};font-weight:bold;">
                     ${item.severity}
                 </td>
             </tr>
@@ -127,7 +133,7 @@ async function loadHistory() {
     } catch (e) {
 
         console.log(
-            "History Error:",
+            "History Error",
             e
         );
 
@@ -135,7 +141,7 @@ async function loadHistory() {
 }
 
 /* ==========================
-   Live Pods
+   Pods
 ========================== */
 
 async function loadPods() {
@@ -185,11 +191,6 @@ async function loadPods() {
 
         table.innerHTML = "";
 
-        document.getElementById(
-            "podCount"
-        ).innerText =
-            pods.length;
-
         pods.forEach(pod => {
 
             const statusColor =
@@ -200,24 +201,11 @@ async function loadPods() {
 
             table.innerHTML += `
             <tr>
-
-                <td>
-                    ${pod.metadata.name}
-                </td>
-
-                <td>
-                    ${pod.metadata.namespace}
-                </td>
-
-                <td
-                    style="
-                        color:${statusColor};
-                        font-weight:bold;
-                    "
-                >
+                <td>${pod.metadata.name}</td>
+                <td>${pod.metadata.namespace}</td>
+                <td style="color:${statusColor};font-weight:bold;">
                     ${pod.status.phase}
                 </td>
-
             </tr>
             `;
         });
@@ -225,7 +213,7 @@ async function loadPods() {
     } catch (e) {
 
         console.log(
-            "Pods Error:",
+            "Pods Error",
             e
         );
 
@@ -261,92 +249,58 @@ async function predictThreat() {
         await fetch(
             `${API}/predict`,
             {
-                method: "POST",
+                method:"POST",
 
-                headers: {
+                headers:{
                     "Content-Type":
-                        "application/json"
+                    "application/json"
                 },
 
                 body:
-                    JSON.stringify({
-                        process_name,
-                        cpu_usage,
-                        memory_usage
-                    })
+                JSON.stringify({
+                    process_name,
+                    cpu_usage,
+                    memory_usage
+                })
             }
         );
 
     const result =
         await res.json();
 
-    const badge =
+    const color =
         result.severity ===
         "Critical"
-
-            ?
-
-            `<span
-                style="
-                    background:#ef4444;
-                    color:white;
-                    padding:10px 20px;
-                    border-radius:10px;
-                    font-weight:bold;
-                "
-            >
-                CRITICAL
-            </span>`
-
-            :
-
-            `<span
-                style="
-                    background:#22c55e;
-                    color:white;
-                    padding:10px 20px;
-                    border-radius:10px;
-                    font-weight:bold;
-                "
-            >
-                LOW
-            </span>`;
+        ? "#ef4444"
+        : "#22c55e";
 
     document.getElementById(
         "result"
     ).innerHTML = `
 
-        <h2>
-            ${badge}
+        <h2 style="color:${color}">
+            ${result.prediction.toUpperCase()}
         </h2>
 
-        <br>
-
         <p>
-            <b>Prediction:</b>
-            ${result.prediction}
+        Threat Type:
+        ${result.threat_type}
         </p>
 
         <p>
-            <b>Threat Type:</b>
-            ${result.threat_type}
+        Severity:
+        ${result.severity}
         </p>
 
         <p>
-            <b>Severity:</b>
-            ${result.severity}
+        Confidence:
+        ${result.score}
         </p>
 
         <p>
-            <b>Confidence:</b>
-            ${result.score}
+        Recommendation:
+        ${result.recommendation}
         </p>
-
-        <p>
-            <b>Recommendation:</b>
-            ${result.recommendation}
-        </p>
-
     `;
 
     loadStats();
@@ -364,69 +318,43 @@ async function restartPod() {
             "Enter Pod Name"
         );
 
-    if (!podName) return;
-
-    document.getElementById(
-        "result"
-    ).innerHTML = `
-        <h3
-            style="
-                color:#f59e0b;
-            "
-        >
-            Triggering Auto Remediation...
-        </h3>
-    `;
+    if(!podName)
+        return;
 
     const res =
         await fetch(
             `${API}/restart-pod`,
             {
-                method: "POST",
+                method:"POST",
 
-                headers: {
+                headers:{
                     "Content-Type":
-                        "application/json"
+                    "application/json"
                 },
 
                 body:
-                    JSON.stringify({
-                        pod_name:
-                            podName,
-                        namespace:
-                            "kubeguardian"
-                    })
+                JSON.stringify({
+                    pod_name:podName,
+                    namespace:
+                    "kubeguardian"
+                })
             }
         );
 
     const result =
         await res.json();
 
-    document.getElementById(
-        "result"
-    ).innerHTML = `
-        <h2
-            style="
-                color:#22c55e;
-            "
-        >
-            Auto Remediation Completed
-        </h2>
+    alert(
+        "Auto Remediation Completed"
+    );
 
-        <pre>
-${JSON.stringify(
-    result,
-    null,
-    2
-)}
-        </pre>
-    `;
+    console.log(result);
 
     loadPods();
 }
 
 /* ==========================
-   Export Functions
+   Export
 ========================== */
 
 window.predictThreat =
@@ -455,4 +383,4 @@ setInterval(() => {
     loadHistory();
     loadPods();
 
-}, 10000);
+},10000);

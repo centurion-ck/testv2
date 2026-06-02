@@ -1,220 +1,245 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+<!DOCTYPE html>
+<html lang="en">
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
+<head>
 
-body{
-    font-family:'Inter',sans-serif;
-    background:#0b1220;
-    color:#ffffff;
-}
+<meta charset="UTF-8">
 
-header{
-    background:linear-gradient(
-        135deg,
-        #111827,
-        #0f172a
-    );
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    padding:30px;
-    text-align:center;
+<title>KubeGuardian AI</title>
 
-    border-bottom:1px solid #1e293b;
-}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-header h1{
-    font-size:42px;
-    font-weight:800;
-    margin-bottom:10px;
-}
+<link rel="stylesheet" href="style.css">
 
-header p{
-    color:#94a3b8;
-    font-size:18px;
-}
+</head>
 
-.container{
-    width:95%;
-    max-width:1500px;
-    margin:auto;
-    padding:20px;
-}
+<body>
 
-.stats{
-    display:grid;
-    grid-template-columns:
-        repeat(auto-fit,minmax(250px,1fr));
+<header>
 
-    gap:20px;
-    margin-bottom:25px;
-}
+<h1>🛡️ KubeGuardian AI</h1>
 
-.stat-card{
+<p>
+Autonomous Kubernetes Threat Detection,
+Security Analytics & Auto Remediation Platform
+</p>
 
-    background:#111827;
+</header>
 
-    border:1px solid #1e293b;
+<div class="container">
 
-    border-radius:18px;
+<div class="card">
 
-    padding:30px;
+<h2>Platform Status</h2>
 
-    text-align:center;
+<p class="success">
+✅ EKS Connected |
+✅ AI Engine Active |
+✅ Auto Remediation Enabled
+</p>
 
-    box-shadow:
-    0 0 25px rgba(0,0,0,.25);
-}
+</div>
 
-.stat-card h3{
-    color:#94a3b8;
-    margin-bottom:10px;
-}
+<div class="stats">
 
-.stat-card h1{
-    font-size:48px;
-    color:#22c55e;
-}
+<div class="stat-card">
+<h3>Cluster Health</h3>
+<h1 id="healthScore">0%</h1>
+</div>
 
-.card{
+<div class="stat-card">
+<h3>Nodes</h3>
+<h1 id="nodeCount">0</h1>
+</div>
 
-    background:#111827;
+<div class="stat-card">
+<h3>Running Pods</h3>
+<h1 id="podCount">0</h1>
+</div>
 
-    border-radius:18px;
+<div class="stat-card">
+<h3>CPU Usage</h3>
+<h1 id="cpuUsage">0m</h1>
+</div>
 
-    border:1px solid #1e293b;
+<div class="stat-card">
+<h3>Memory Usage</h3>
+<h1 id="memoryUsage">0Mi</h1>
+</div>
 
-    padding:25px;
+<div class="stat-card">
+<h3>Total Threats</h3>
+<h1 id="totalThreats">0</h1>
+</div>
 
-    margin-bottom:25px;
+<div class="stat-card">
+<h3>Critical Threats</h3>
+<h1 id="criticalThreats">0</h1>
+</div>
 
-    box-shadow:
-    0 0 25px rgba(0,0,0,.25);
-}
+<div class="stat-card">
+<h3>Low Threats</h3>
+<h1 id="lowThreats">0</h1>
+</div>
 
-.card h2{
-    margin-bottom:20px;
-}
+</div>
 
-input{
+<div class="card">
 
-    width:100%;
+<h2>🤖 AI Threat Prediction Engine</h2>
 
-    padding:15px;
+<input
+type="text"
+id="process"
+placeholder="Process Name (xmrig)"
+>
 
-    margin-bottom:15px;
+<input
+type="number"
+id="cpu"
+placeholder="CPU Usage %"
+>
 
-    border-radius:12px;
+<input
+type="number"
+id="memory"
+placeholder="Memory Usage MB"
+>
 
-    border:1px solid #334155;
+<button onclick="predictThreat()">
+Analyze Threat
+</button>
 
-    background:#0f172a;
+</div>
 
-    color:white;
+<div class="card">
 
-    font-size:15px;
-}
+<h2>📊 Prediction Result</h2>
 
-input:focus{
-    outline:none;
-    border-color:#22c55e;
-}
+<div id="result">
 
-button{
+Waiting for threat analysis...
 
-    background:#22c55e;
+</div>
 
-    color:white;
+</div>
 
-    border:none;
+<div class="card">
 
-    padding:14px 20px;
+<h2>☸️ Live Kubernetes Pods</h2>
 
-    border-radius:12px;
+<table>
 
-    cursor:pointer;
+<thead>
 
-    font-size:15px;
+<tr>
 
-    font-weight:600;
+<th>Pod Name</th>
 
-    transition:.3s;
-}
+<th>Namespace</th>
 
-button:hover{
+<th>Status</th>
 
-    transform:translateY(-2px);
+</tr>
 
-    background:#16a34a;
-}
+</thead>
 
-table{
+<tbody id="podsTable">
 
-    width:100%;
+</tbody>
 
-    border-collapse:collapse;
+</table>
 
-    overflow:hidden;
-}
+</div>
 
-th{
+<div class="card">
 
-    background:#0f172a;
+<h2>📜 Threat History</h2>
 
-    color:#22c55e;
+<table id="historyTable">
 
-    padding:15px;
+<thead>
 
-    text-align:left;
+<tr>
 
-    border-bottom:1px solid #334155;
-}
+<th>Timestamp</th>
 
-td{
+<th>Process</th>
 
-    padding:14px;
+<th>Prediction</th>
 
-    border-bottom:1px solid #1e293b;
-}
+<th>Severity</th>
 
-tr:hover{
-    background:#172033;
-}
+</tr>
 
-#result{
+</thead>
 
-    padding:20px;
+<tbody>
 
-    border-radius:12px;
+</tbody>
 
-    background:#0f172a;
+</table>
 
-    border:1px solid #334155;
+</div>
 
-    line-height:1.8;
-}
+<div class="card">
 
-.success{
-    color:#22c55e;
-}
+<h2>⚡ Auto Remediation</h2>
 
-.danger{
-    color:#ef4444;
-}
+<p>
 
-.warning{
-    color:#f59e0b;
-}
+Restart unhealthy Kubernetes workloads automatically.
 
-.footer{
+</p>
 
-    text-align:center;
+<br>
 
-    color:#64748b;
+<button onclick="restartPod()">
 
-    margin-top:20px;
+Trigger Auto Remediation
 
-    padding-bottom:20px;
-}
+</button>
+
+</div>
+
+<div class="card">
+
+<h2>🚀 Platform Capabilities</h2>
+
+<ul>
+
+<li>✅ AI Threat Detection</li>
+
+<li>✅ Kubernetes Monitoring</li>
+
+<li>✅ Real-Time Metrics</li>
+
+<li>✅ Auto Remediation</li>
+
+<li>✅ EKS Production Deployment</li>
+
+<li>✅ RBAC Security</li>
+
+<li>✅ AWS ALB Ingress</li>
+
+<li>✅ Docker + ECR + CI/CD</li>
+
+</ul>
+
+</div>
+
+</div>
+
+<div class="footer">
+
+KubeGuardian AI © 2026
+
+</div>
+
+<script src="app.js"></script>
+
+</body>
+
+</html>
