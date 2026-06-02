@@ -94,6 +94,17 @@ loadHistory();
 
 setInterval(loadHistory, 5000);
 
+async function loadPods() {
+
+    const response = await fetch(
+        "http://13.215.252.224:8000/pods"
+    );
+
+    const data = await response.json();
+
+    console.log(data);
+}
+
 
 async function loadStats(){
 
