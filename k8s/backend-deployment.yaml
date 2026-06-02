@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: kubeguardian-backend
+  namespace: kubeguardian
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: kubeguardian-backend
+
+  template:
+    metadata:
+      labels:
+        app: kubeguardian-backend
+
+    spec:
+      containers:
+
+      - name: backend
+
+        image: 093435167670.dkr.ecr.ap-southeast-1.amazonaws.com/kubeguardian-backend:latest
+
+        imagePullPolicy: Always
+
+        ports:
+        - containerPort: 8000
