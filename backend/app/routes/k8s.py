@@ -8,18 +8,23 @@ router = APIRouter(
 
 @router.get("/pods")
 def get_pods():
+
     try:
-        result = subprocess.check_output(
-            ["kubectl", "get", "pods", "-A"]
-        ).decode()
+
+        result = subprocess.run(
+            ["kubectl", "get", "pods", "-A"],
+            capture_output=True,
+            text=True
+        )
 
         return {
-            "status": "success",
-            "pods": result
+            "returncode": result.returncode,
+            "stdout": result.stdout,
+            "stderr": result.stderr
         }
 
     except Exception as e:
+
         return {
-            "status": "failed",
             "error": str(e)
         }
