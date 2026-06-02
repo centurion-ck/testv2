@@ -1,245 +1,277 @@
-<!DOCTYPE html>
-<html lang="en">
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
-<head>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
 
-<meta charset="UTF-8">
+body{
+    font-family:'Inter',sans-serif;
+    background:#0b1220;
+    color:#ffffff;
+}
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+header{
+    background:linear-gradient(
+        135deg,
+        #111827,
+        #0f172a
+    );
 
-<title>KubeGuardian AI</title>
+    padding:35px;
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    text-align:center;
 
-<link rel="stylesheet" href="style.css">
+    border-bottom:1px solid #1e293b;
+}
 
-</head>
+header h1{
+    font-size:42px;
+    font-weight:800;
+    margin-bottom:10px;
+}
 
-<body>
+header p{
+    color:#94a3b8;
+    font-size:18px;
+}
 
-<header>
+.container{
+    width:95%;
+    max-width:1600px;
+    margin:auto;
+    padding:25px;
+}
 
-<h1>🛡️ KubeGuardian AI</h1>
+.stats{
+    display:grid;
 
-<p>
-Autonomous Kubernetes Threat Detection,
-Security Analytics & Auto Remediation Platform
-</p>
+    grid-template-columns:
+        repeat(auto-fit,minmax(220px,1fr));
 
-</header>
+    gap:20px;
 
-<div class="container">
+    margin-bottom:25px;
+}
 
-<div class="card">
+.stat-card{
 
-<h2>Platform Status</h2>
+    background:#111827;
 
-<p class="success">
-✅ EKS Connected |
-✅ AI Engine Active |
-✅ Auto Remediation Enabled
-</p>
+    border:1px solid #1e293b;
 
-</div>
+    border-radius:18px;
 
-<div class="stats">
+    padding:25px;
 
-<div class="stat-card">
-<h3>Cluster Health</h3>
-<h1 id="healthScore">0%</h1>
-</div>
+    text-align:center;
 
-<div class="stat-card">
-<h3>Nodes</h3>
-<h1 id="nodeCount">0</h1>
-</div>
+    transition:.3s;
 
-<div class="stat-card">
-<h3>Running Pods</h3>
-<h1 id="podCount">0</h1>
-</div>
+    box-shadow:
+        0 0 25px rgba(0,0,0,.25);
+}
 
-<div class="stat-card">
-<h3>CPU Usage</h3>
-<h1 id="cpuUsage">0m</h1>
-</div>
+.stat-card:hover{
 
-<div class="stat-card">
-<h3>Memory Usage</h3>
-<h1 id="memoryUsage">0Mi</h1>
-</div>
+    transform:translateY(-4px);
 
-<div class="stat-card">
-<h3>Total Threats</h3>
-<h1 id="totalThreats">0</h1>
-</div>
+    border-color:#2563eb;
+}
 
-<div class="stat-card">
-<h3>Critical Threats</h3>
-<h1 id="criticalThreats">0</h1>
-</div>
+.stat-card h3{
 
-<div class="stat-card">
-<h3>Low Threats</h3>
-<h1 id="lowThreats">0</h1>
-</div>
+    color:#94a3b8;
 
-</div>
+    margin-bottom:12px;
 
-<div class="card">
+    font-size:15px;
+}
 
-<h2>🤖 AI Threat Prediction Engine</h2>
+.stat-card h1{
 
-<input
-type="text"
-id="process"
-placeholder="Process Name (xmrig)"
->
+    font-size:42px;
 
-<input
-type="number"
-id="cpu"
-placeholder="CPU Usage %"
->
+    font-weight:800;
 
-<input
-type="number"
-id="memory"
-placeholder="Memory Usage MB"
->
+    color:#22c55e;
+}
 
-<button onclick="predictThreat()">
-Analyze Threat
-</button>
+.card{
 
-</div>
+    background:#111827;
 
-<div class="card">
+    border-radius:18px;
 
-<h2>📊 Prediction Result</h2>
+    border:1px solid #1e293b;
 
-<div id="result">
+    padding:25px;
 
-Waiting for threat analysis...
+    margin-bottom:25px;
 
-</div>
+    box-shadow:
+        0 0 25px rgba(0,0,0,.25);
+}
 
-</div>
+.card h2{
 
-<div class="card">
+    margin-bottom:20px;
 
-<h2>☸️ Live Kubernetes Pods</h2>
+    color:white;
+}
 
-<table>
+input{
 
-<thead>
+    width:100%;
 
-<tr>
+    padding:14px;
 
-<th>Pod Name</th>
+    margin-bottom:15px;
 
-<th>Namespace</th>
+    border-radius:12px;
 
-<th>Status</th>
+    border:1px solid #334155;
 
-</tr>
+    background:#0f172a;
 
-</thead>
+    color:white;
 
-<tbody id="podsTable">
+    font-size:15px;
+}
 
-</tbody>
+input:focus{
 
-</table>
+    outline:none;
 
-</div>
+    border-color:#22c55e;
+}
 
-<div class="card">
+button{
 
-<h2>📜 Threat History</h2>
+    background:#22c55e;
 
-<table id="historyTable">
+    color:white;
 
-<thead>
+    border:none;
 
-<tr>
+    padding:14px 24px;
 
-<th>Timestamp</th>
+    border-radius:12px;
 
-<th>Process</th>
+    cursor:pointer;
 
-<th>Prediction</th>
+    font-size:15px;
 
-<th>Severity</th>
+    font-weight:600;
 
-</tr>
+    transition:.3s;
+}
 
-</thead>
+button:hover{
 
-<tbody>
+    background:#16a34a;
 
-</tbody>
+    transform:translateY(-2px);
+}
 
-</table>
+table{
 
-</div>
+    width:100%;
 
-<div class="card">
+    border-collapse:collapse;
 
-<h2>⚡ Auto Remediation</h2>
+    overflow:hidden;
+}
 
-<p>
+th{
 
-Restart unhealthy Kubernetes workloads automatically.
+    background:#0f172a;
 
-</p>
+    color:#22c55e;
 
-<br>
+    padding:15px;
 
-<button onclick="restartPod()">
+    text-align:left;
 
-Trigger Auto Remediation
+    border-bottom:1px solid #334155;
+}
 
-</button>
+td{
 
-</div>
+    padding:14px;
 
-<div class="card">
+    border-bottom:1px solid #1e293b;
+}
 
-<h2>🚀 Platform Capabilities</h2>
+tr:hover{
 
-<ul>
+    background:#172033;
+}
 
-<li>✅ AI Threat Detection</li>
+#result{
 
-<li>✅ Kubernetes Monitoring</li>
+    background:#0f172a;
 
-<li>✅ Real-Time Metrics</li>
+    border:1px solid #334155;
 
-<li>✅ Auto Remediation</li>
+    border-radius:12px;
 
-<li>✅ EKS Production Deployment</li>
+    padding:20px;
 
-<li>✅ RBAC Security</li>
+    min-height:120px;
 
-<li>✅ AWS ALB Ingress</li>
+    line-height:1.8;
+}
 
-<li>✅ Docker + ECR + CI/CD</li>
+.success{
+    color:#22c55e;
+}
 
-</ul>
+.warning{
+    color:#f59e0b;
+}
 
-</div>
+.danger{
+    color:#ef4444;
+}
 
-</div>
+ul{
 
-<div class="footer">
+    padding-left:20px;
+}
 
-KubeGuardian AI © 2026
+ul li{
 
-</div>
+    margin-bottom:12px;
+}
 
-<script src="app.js"></script>
+.footer{
 
-</body>
+    text-align:center;
 
-</html>
+    color:#64748b;
+
+    padding:20px;
+
+    margin-top:20px;
+}
+
+@media(max-width:768px){
+
+    .stats{
+
+        grid-template-columns:
+            repeat(2,1fr);
+    }
+
+    header h1{
+
+        font-size:30px;
+    }
+
+    .stat-card h1{
+
+        font-size:30px;
+    }
+}
