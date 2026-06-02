@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import mlflow
 import mlflow.sklearn
@@ -8,9 +9,38 @@ from sklearn.metrics import accuracy_score
 
 import joblib
 
-mlflow.set_experiment("KubeGuardian-AI")
+# Force Jenkins MLflow location
+os.environ["MLFLOW_TRACKING_URI"] = "file:///var/lib/jenkins/mlruns"
 
-df = pd.read_csv("dataset/threats.csv")
+mlflow.set_tracking_uri("file:///var/lib/jenkins/mlruns")
+
+print("MLFLOW URI =", mlflow.get_tracking_uri())
+
+# Create experiment if not exists
+experiment_name = "KubeGuardian-AI"
+
+try:
+    experiment = mlflow.get_experiment_by_name(
+        experiment_name
+    )
+
+    if experiment is None:
+
+        mlflow.create_experiment(
+            experiment_name,
+            artifact_location="file:///var/lib/jenkins/mlruns"
+        )
+
+except Exception as e:
+
+    print("Experiment Create Error:", e)
+
+mlflow.set_experiment(experiment_name)
+
+# Load Dataset
+df = pd.read_csv(
+    "dataset/threats.csv"
+)
 
 encoder = LabelEncoder()
 
@@ -54,11 +84,6 @@ with mlflow.start_run():
         accuracy
     )
 
-    mlflow.sklearn.log_model(
-        model,
-        "model"
-    )
-
     joblib.dump(
         model,
         "model.pkl"
@@ -69,7 +94,17 @@ with mlflow.start_run():
         "encoder.pkl"
     )
 
+    mlflow.log_artifact(
+        "model.pkl"
+    )
+
+    mlflow.log_artifact(
+        "encoder.pkl"
+    )
+
     print(
         "Accuracy:",
         accuracy
     )
+
+print("Training Completed")
