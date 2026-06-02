@@ -3,7 +3,10 @@ import joblib
 import json
 from datetime import datetime
 
-router = APIRouter()
+#router = APIRouter()
+router = APIRouter(
+    prefix="/api"
+)
 
 model = joblib.load("/app/model.pkl")
 encoder = joblib.load("/app/encoder.pkl")

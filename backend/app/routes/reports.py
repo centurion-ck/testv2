@@ -4,7 +4,11 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import Threat
 
-router = APIRouter()
+#router = APIRouter()
+
+router = APIRouter(
+    prefix="/api"
+)
 
 @router.get("/reports")
 def reports(
