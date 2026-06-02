@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KubeGuardian AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="style.css">
 </head>
@@ -12,11 +13,22 @@
 <body>
 
 <header>
-    <h1>KubeGuardian AI</h1>
-    <p>Autonomous Kubernetes Threat Detection Platform</p>
+    <h1>🛡️ KubeGuardian AI</h1>
+    <p>
+        Autonomous Kubernetes Threat Detection,
+        Security Analytics & Auto Remediation Platform
+    </p>
 </header>
 
 <div class="container">
+
+    <div class="card">
+        <h2>Platform Status</h2>
+        <p class="success">
+            ✅ EKS Cluster Connected | ✅ AI Engine Active |
+            ✅ Auto Remediation Enabled
+        </p>
+    </div>
 
     <div class="stats">
 
@@ -39,67 +51,66 @@
 
     <div class="card">
 
-        <h2>Threat Prediction</h2>
+        <h2>🤖 AI Threat Prediction Engine</h2>
 
         <input
             type="text"
             id="process"
-            placeholder="Process Name"
+            placeholder="Process Name (Example: xmrig)"
         >
 
         <input
             type="number"
             id="cpu"
-            placeholder="CPU Usage"
+            placeholder="CPU Usage %"
         >
 
         <input
             type="number"
             id="memory"
-            placeholder="Memory Usage"
+            placeholder="Memory Usage MB"
         >
 
         <button onclick="predictThreat()">
-            Predict Threat
+            Analyze Threat
         </button>
 
     </div>
 
     <div class="card">
 
-        <h2>Prediction Result</h2>
+        <h2>📊 Prediction Result</h2>
 
         <div id="result">
-            Waiting for prediction...
+            Waiting for threat analysis...
         </div>
 
     </div>
 
     <div class="card">
 
-    <h2>Live Kubernetes Pods</h2>
+        <h2>☸️ Live Kubernetes Cluster Pods</h2>
 
-    <table>
+        <table>
 
-        <thead>
-            <tr>
-                <th>Pod</th>
-                <th>Namespace</th>
-                <th>Status</th>
-            </tr>
-        </thead>
+            <thead>
+                <tr>
+                    <th>Pod Name</th>
+                    <th>Namespace</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
 
-        <tbody id="podsTable">
+            <tbody id="podsTable">
+            </tbody>
 
-        </tbody>
+        </table>
 
-    </table>
-
-</div>
+    </div>
 
     <div class="card">
 
-        <h2>Threat History</h2>
+        <h2>📜 Threat History</h2>
 
         <table id="historyTable">
 
@@ -122,11 +133,42 @@
 
     </div>
 
+    <div class="card">
+
+        <h2>⚡ Auto Remediation Engine</h2>
+
+        <p>
+            Restart unhealthy Kubernetes pods automatically.
+        </p>
+
+        <button onclick="restartPod()">
+            Trigger Auto Remediation
+        </button>
+
+    </div>
+
+    <div class="card">
+
+        <h2>🚀 Platform Capabilities</h2>
+
+        <ul>
+            <li>✅ AI Threat Detection</li>
+            <li>✅ Kubernetes Security Monitoring</li>
+            <li>✅ Real-Time Pod Visibility</li>
+            <li>✅ Auto Remediation</li>
+            <li>✅ EKS Production Deployment</li>
+            <li>✅ RBAC Protected Operations</li>
+            <li>✅ AWS ALB Ingress</li>
+            <li>✅ Docker + ECR + Jenkins CI/CD</li>
+        </ul>
+
+    </div>
+
 </div>
 
-<button onclick="restartPod()">
-  Auto Remediate
-</button>
+<div class="footer">
+    KubeGuardian AI © 2026
+</div>
 
 <script src="app.js"></script>
 
