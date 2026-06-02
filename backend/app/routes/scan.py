@@ -3,22 +3,30 @@ import subprocess
 
 router = APIRouter(
     prefix="/api",
-    tags=["Kubernetes"]
+    tags=["Scanner"]
 )
 
-@router.get("/pods")
-def get_pods():
+@router.get("/scan-cluster")
+def scan_cluster():
+
     try:
+
         result = subprocess.check_output(
-            ["kubectl", "get", "pods", "-A"]
+            [
+                "kubectl",
+                "top",
+                "pods",
+                "-A"
+            ]
         ).decode()
 
         return {
             "status": "success",
-            "pods": result
+            "data": result
         }
 
     except Exception as e:
+
         return {
             "status": "failed",
             "error": str(e)
