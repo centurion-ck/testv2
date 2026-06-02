@@ -5,6 +5,7 @@ from app.routes.health import router as health_router
 from app.routes.predict import router as predict_router
 from app.routes.scan import router as scan_router
 from app.routes.remediation import router as remediation_router
+from app.routes.cluster import router as cluster_router
 
 app = FastAPI(
     title="KubeGuardian AI",
@@ -25,6 +26,7 @@ app.include_router(k8s.router)
 app.include_router(k8s.router)
 app.include_router(scan_router)
 app.include_router(remediation_router)
+app.include_router(cluster_router)
 
 @app.get("/")
 def root():
