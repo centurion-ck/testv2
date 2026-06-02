@@ -3,6 +3,8 @@ import pandas as pd
 import mlflow
 import mlflow.sklearn
 
+os.environ["MLFLOW_ALLOW_FILE_STORE"] = "true"
+
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import accuracy_score
@@ -104,7 +106,7 @@ with mlflow.start_run():
 
     print(
         "Accuracy:",
-        accuracy
+        accuracy    
     )
 
 print("Training Completed")
