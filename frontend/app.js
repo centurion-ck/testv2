@@ -401,6 +401,80 @@ async function predictThreat() {
     loadHistory();
 }
 
+const copilotRes =
+await fetch(
+    "/api/copilot",
+    {
+        method:"POST",
+
+        headers:{
+            "Content-Type":
+            "application/json"
+        },
+
+        body:JSON.stringify({
+
+            process_name,
+
+            prediction:
+            result.prediction
+
+        })
+    }
+);
+
+const copilot =
+await copilotRes.json();
+
+document.getElementById(
+    "incidentReport"
+).innerHTML = `
+
+<h2 style="color:#22c55e;">
+${copilot.incident_id}
+</h2>
+
+<p>
+<b>Risk Score:</b>
+${copilot.risk_score}/100
+</p>
+
+<p>
+<b>Summary:</b><br>
+${copilot.summary}
+</p>
+
+<p>
+<b>Root Cause:</b><br>
+${copilot.root_cause}
+</p>
+
+<p>
+<b>Impact:</b><br>
+${copilot.impact}
+</p>
+
+<p>
+<b>Executive Summary:</b><br>
+${copilot.executive_summary}
+</p>
+
+<h3>
+Actions
+</h3>
+
+<ul>
+
+${copilot.actions
+.map(
+x => `<li>${x}</li>`
+)
+.join("")}
+
+</ul>
+
+`;
+
 /* ==========================
    Auto Remediation
 ========================== */
