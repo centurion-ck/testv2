@@ -344,3 +344,26 @@ ul li{
     margin-top:15px;
 
 }
+
+.grafana-grid {
+
+display:grid;
+
+grid-template-columns:
+repeat(2,1fr);
+
+gap:20px;
+
+margin-top:20px;
+
+}
+
+.grafana-grid iframe {
+
+background:#111827;
+
+border-radius:15px;
+
+border:1px solid #334155;
+
+}
