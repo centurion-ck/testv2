@@ -303,7 +303,91 @@ async function predictThreat() {
         </p>
     `;
 
+    const aiRes =
+        await fetch(
+            `${API}/recommendation`,
+            {
+                method:"POST",
+
+                headers:{
+                    "Content-Type":
+                    "application/json"
+                },
+
+                body:JSON.stringify({
+
+                    process_name,
+
+                    cpu_usage,
+
+                    memory_usage,
+
+                    prediction:
+                    result.prediction
+
+                })
+            }
+        );
+
+    const ai =
+        await aiRes.json();
+
+    document.getElementById(
+        "recommendation"
+    ).innerHTML = `
+
+    <div
+    style="
+    background:#0f172a;
+    padding:20px;
+    border-radius:12px;
+    border:1px solid #334155;
+    "
+    >
+
+    <h2 style="color:#22c55e;">
+    🧠 AI Security Analysis
+    </h2>
+
+    <p>
+    <b>Security Score:</b>
+    ${ai.security_score}/100
+    </p>
+
+    <p>
+    <b>Severity:</b>
+    ${ai.severity}
+    </p>
+
+    <p>
+    <b>Root Cause:</b><br>
+    ${ai.root_cause}
+    </p>
+
+    <p>
+    <b>Impact:</b><br>
+    ${ai.impact}
+    </p>
+
+    <h3>
+    Recommended Actions
+    </h3>
+
+    <ul>
+
+    ${ai.actions
+        .map(
+            a => `<li>${a}</li>`
+        )
+        .join("")}
+
+    </ul>
+
+    </div>
+    `;
+
     loadStats();
+
     loadHistory();
 }
 
