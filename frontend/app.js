@@ -256,8 +256,7 @@ async function predictThreat() {
                     "application/json"
                 },
 
-                body:
-                JSON.stringify({
+                body:JSON.stringify({
                     process_name,
                     cpu_usage,
                     memory_usage
@@ -271,36 +270,37 @@ async function predictThreat() {
     const color =
         result.severity ===
         "Critical"
-        ? "#ef4444"
-        : "#22c55e";
+            ? "#ef4444"
+            : "#22c55e";
 
     document.getElementById(
         "result"
     ).innerHTML = `
 
-        <h2 style="color:${color}">
-            ${result.prediction.toUpperCase()}
-        </h2>
+    <h2 style="color:${color}">
+        ${result.prediction.toUpperCase()}
+    </h2>
 
-        <p>
-        Threat Type:
-        ${result.threat_type}
-        </p>
+    <p>
+    Threat Type:
+    ${result.threat_type}
+    </p>
 
-        <p>
-        Severity:
-        ${result.severity}
-        </p>
+    <p>
+    Severity:
+    ${result.severity}
+    </p>
 
-        <p>
-        Confidence:
-        ${result.score}
-        </p>
+    <p>
+    Confidence:
+    ${result.score}
+    </p>
 
-        <p>
-        Recommendation:
-        ${result.recommendation}
-        </p>
+    <p>
+    Recommendation:
+    ${result.recommendation}
+    </p>
+
     `;
 
     const aiRes =
@@ -336,42 +336,51 @@ async function predictThreat() {
         "recommendation"
     ).innerHTML = `
 
-    <div
-    style="
-    background:#0f172a;
-    padding:20px;
-    border-radius:12px;
-    border:1px solid #334155;
-    "
-    >
+    <div class="ai-score">
 
-    <h2 style="color:#22c55e;">
-    🧠 AI Security Analysis
-    </h2>
+        ${ai.security_score}/100
+
+    </div>
 
     <p>
-    <b>Security Score:</b>
-    ${ai.security_score}/100
-    </p>
 
-    <p>
     <b>Severity:</b>
+
+    <span class="${
+        ai.severity === "Critical"
+            ? "ai-critical"
+            : "ai-low"
+    }">
+
     ${ai.severity}
+
+    </span>
+
     </p>
 
-    <p>
-    <b>Root Cause:</b><br>
+    <div class="ai-section">
+
+    <b>Root Cause</b>
+
+    <br>
+
     ${ai.root_cause}
-    </p>
 
-    <p>
-    <b>Impact:</b><br>
+    </div>
+
+    <div class="ai-section">
+
+    <b>Impact</b>
+
+    <br>
+
     ${ai.impact}
-    </p>
 
-    <h3>
-    Recommended Actions
-    </h3>
+    </div>
+
+    <div class="ai-section">
+
+    <b>Recommended Actions</b>
 
     <ul>
 
@@ -384,6 +393,7 @@ async function predictThreat() {
     </ul>
 
     </div>
+
     `;
 
     loadStats();

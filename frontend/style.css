@@ -300,3 +300,47 @@ ul li{
 .ai-section{
     margin-top:15px;
 }
+
+.ai-card{
+
+    background:#0f172a;
+
+    border:1px solid #334155;
+
+    border-radius:12px;
+
+    padding:20px;
+
+    line-height:1.8;
+
+}
+
+.ai-score{
+
+    font-size:56px;
+
+    font-weight:800;
+
+    color:#22c55e;
+
+    margin-bottom:15px;
+
+}
+
+.ai-critical{
+
+    color:#ef4444;
+
+}
+
+.ai-low{
+
+    color:#22c55e;
+
+}
+
+.ai-section{
+
+    margin-top:15px;
+
+}
