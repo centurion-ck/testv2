@@ -8,13 +8,11 @@ async function loadClusterMetrics() {
 
     try {
 
-        const res =
-            await fetch(
-                `${API}/cluster-metrics`
-            );
+        const res = await fetch(
+            `${API}/cluster-metrics`
+        );
 
-        const data =
-            await res.json();
+        const data = await res.json();
 
         document.getElementById(
             "healthScore"
@@ -54,13 +52,11 @@ async function loadStats() {
 
     try {
 
-        const res =
-            await fetch(
-                `${API}/stats`
-            );
+        const res = await fetch(
+            `${API}/stats`
+        );
 
-        const data =
-            await res.json();
+        const data = await res.json();
 
         document.getElementById(
             "totalThreats"
@@ -95,13 +91,11 @@ async function loadHistory() {
 
     try {
 
-        const res =
-            await fetch(
-                `${API}/history`
-            );
+        const res = await fetch(
+            `${API}/history`
+        );
 
-        const data =
-            await res.json();
+        const data = await res.json();
 
         const tbody =
             document.querySelector(
@@ -226,254 +220,272 @@ async function loadPods() {
 
 async function predictThreat() {
 
-    const process_name =
+    try {
+
+        const process_name =
+            document.getElementById(
+                "process"
+            ).value;
+
+        const cpu_usage =
+            parseInt(
+                document.getElementById(
+                    "cpu"
+                ).value
+            );
+
+        const memory_usage =
+            parseInt(
+                document.getElementById(
+                    "memory"
+                ).value
+            );
+
+        /* Prediction API */
+
+        const res =
+            await fetch(
+                `${API}/predict`,
+                {
+                    method:"POST",
+
+                    headers:{
+                        "Content-Type":
+                        "application/json"
+                    },
+
+                    body:JSON.stringify({
+                        process_name,
+                        cpu_usage,
+                        memory_usage
+                    })
+                }
+            );
+
+        const result =
+            await res.json();
+
+        const color =
+            result.severity ===
+            "Critical"
+                ? "#ef4444"
+                : "#22c55e";
+
         document.getElementById(
-            "process"
-        ).value;
+            "result"
+        ).innerHTML = `
 
-    const cpu_usage =
-        parseInt(
-            document.getElementById(
-                "cpu"
-            ).value
+        <h2 style="color:${color}">
+            ${result.prediction.toUpperCase()}
+        </h2>
+
+        <p>
+        Threat Type:
+        ${result.threat_type}
+        </p>
+
+        <p>
+        Severity:
+        ${result.severity}
+        </p>
+
+        <p>
+        Confidence:
+        ${result.score}
+        </p>
+
+        <p>
+        Recommendation:
+        ${result.recommendation}
+        </p>
+        `;
+
+        /* Recommendation API */
+
+        const aiRes =
+            await fetch(
+                `${API}/recommendation`,
+                {
+                    method:"POST",
+
+                    headers:{
+                        "Content-Type":
+                        "application/json"
+                    },
+
+                    body:JSON.stringify({
+
+                        process_name,
+
+                        cpu_usage,
+
+                        memory_usage,
+
+                        prediction:
+                        result.prediction
+
+                    })
+                }
+            );
+
+        const ai =
+            await aiRes.json();
+
+        document.getElementById(
+            "recommendation"
+        ).innerHTML = `
+
+        <div class="ai-score">
+
+            ${ai.security_score}/100
+
+        </div>
+
+        <p>
+
+        <b>Severity:</b>
+
+        <span class="${
+            ai.severity === "Critical"
+                ? "ai-critical"
+                : "ai-low"
+        }">
+
+        ${ai.severity}
+
+        </span>
+
+        </p>
+
+        <div class="ai-section">
+
+        <b>Root Cause</b>
+
+        <br>
+
+        ${ai.root_cause}
+
+        </div>
+
+        <div class="ai-section">
+
+        <b>Impact</b>
+
+        <br>
+
+        ${ai.impact}
+
+        </div>
+
+        <div class="ai-section">
+
+        <b>Recommended Actions</b>
+
+        <ul>
+
+        ${ai.actions
+            .map(
+                a => `<li>${a}</li>`
+            )
+            .join("")}
+
+        </ul>
+
+        </div>
+
+        `;
+
+        /* Incident Copilot API */
+
+        const copilotRes =
+            await fetch(
+                `${API}/copilot`,
+                {
+                    method:"POST",
+
+                    headers:{
+                        "Content-Type":
+                        "application/json"
+                    },
+
+                    body:JSON.stringify({
+
+                        process_name,
+
+                        prediction:
+                        result.prediction
+
+                    })
+                }
+            );
+
+        const copilot =
+            await copilotRes.json();
+
+        document.getElementById(
+            "incidentReport"
+        ).innerHTML = `
+
+        <div class="copilot-box">
+
+        <h2 style="color:#22c55e;">
+        ${copilot.incident_id}
+        </h2>
+
+        <p>
+        <b>Risk Score:</b>
+        ${copilot.risk_score}/100
+        </p>
+
+        <p>
+        <b>Summary:</b><br>
+        ${copilot.summary}
+        </p>
+
+        <p>
+        <b>Root Cause:</b><br>
+        ${copilot.root_cause}
+        </p>
+
+        <p>
+        <b>Impact:</b><br>
+        ${copilot.impact}
+        </p>
+
+        <p>
+        <b>Executive Summary:</b><br>
+        ${copilot.executive_summary}
+        </p>
+
+        <h3>
+        Recommended Actions
+        </h3>
+
+        <ul>
+
+        ${copilot.actions
+            .map(
+                x => `<li>${x}</li>`
+            )
+            .join("")}
+
+        </ul>
+
+        </div>
+        `;
+
+        loadStats();
+        loadHistory();
+
+    } catch (e) {
+
+        console.log(
+            "Prediction Error",
+            e
         );
 
-    const memory_usage =
-        parseInt(
-            document.getElementById(
-                "memory"
-            ).value
-        );
-
-    const res =
-        await fetch(
-            `${API}/predict`,
-            {
-                method:"POST",
-
-                headers:{
-                    "Content-Type":
-                    "application/json"
-                },
-
-                body:JSON.stringify({
-                    process_name,
-                    cpu_usage,
-                    memory_usage
-                })
-            }
-        );
-
-    const result =
-        await res.json();
-
-    const color =
-        result.severity ===
-        "Critical"
-            ? "#ef4444"
-            : "#22c55e";
-
-    document.getElementById(
-        "result"
-    ).innerHTML = `
-
-    <h2 style="color:${color}">
-        ${result.prediction.toUpperCase()}
-    </h2>
-
-    <p>
-    Threat Type:
-    ${result.threat_type}
-    </p>
-
-    <p>
-    Severity:
-    ${result.severity}
-    </p>
-
-    <p>
-    Confidence:
-    ${result.score}
-    </p>
-
-    <p>
-    Recommendation:
-    ${result.recommendation}
-    </p>
-
-    `;
-
-    const aiRes =
-        await fetch(
-            `${API}/recommendation`,
-            {
-                method:"POST",
-
-                headers:{
-                    "Content-Type":
-                    "application/json"
-                },
-
-                body:JSON.stringify({
-
-                    process_name,
-
-                    cpu_usage,
-
-                    memory_usage,
-
-                    prediction:
-                    result.prediction
-
-                })
-            }
-        );
-
-    const ai =
-        await aiRes.json();
-
-    document.getElementById(
-        "recommendation"
-    ).innerHTML = `
-
-    <div class="ai-score">
-
-        ${ai.security_score}/100
-
-    </div>
-
-    <p>
-
-    <b>Severity:</b>
-
-    <span class="${
-        ai.severity === "Critical"
-            ? "ai-critical"
-            : "ai-low"
-    }">
-
-    ${ai.severity}
-
-    </span>
-
-    </p>
-
-    <div class="ai-section">
-
-    <b>Root Cause</b>
-
-    <br>
-
-    ${ai.root_cause}
-
-    </div>
-
-    <div class="ai-section">
-
-    <b>Impact</b>
-
-    <br>
-
-    ${ai.impact}
-
-    </div>
-
-    <div class="ai-section">
-
-    <b>Recommended Actions</b>
-
-    <ul>
-
-    ${ai.actions
-        .map(
-            a => `<li>${a}</li>`
-        )
-        .join("")}
-
-    </ul>
-
-    </div>
-
-    `;
-
-    loadStats();
-
-    loadHistory();
-}
-
-const copilotRes =
-await fetch(
-    "/api/copilot",
-    {
-        method:"POST",
-
-        headers:{
-            "Content-Type":
-            "application/json"
-        },
-
-        body:JSON.stringify({
-
-            process_name,
-
-            prediction:
-            result.prediction
-
-        })
     }
-);
-
-const copilot =
-await copilotRes.json();
-
-document.getElementById(
-    "incidentReport"
-).innerHTML = `
-
-<h2 style="color:#22c55e;">
-${copilot.incident_id}
-</h2>
-
-<p>
-<b>Risk Score:</b>
-${copilot.risk_score}/100
-</p>
-
-<p>
-<b>Summary:</b><br>
-${copilot.summary}
-</p>
-
-<p>
-<b>Root Cause:</b><br>
-${copilot.root_cause}
-</p>
-
-<p>
-<b>Impact:</b><br>
-${copilot.impact}
-</p>
-
-<p>
-<b>Executive Summary:</b><br>
-${copilot.executive_summary}
-</p>
-
-<h3>
-Actions
-</h3>
-
-<ul>
-
-${copilot.actions
-.map(
-x => `<li>${x}</li>`
-)
-.join("")}
-
-</ul>
-
-`;
+}
 
 /* ==========================
    Auto Remediation
@@ -551,4 +563,4 @@ setInterval(() => {
     loadHistory();
     loadPods();
 
-},10000);
+}, 10000);
