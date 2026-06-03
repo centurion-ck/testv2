@@ -7,31 +7,42 @@ router = APIRouter(
 @router.post("/recommendation")
 def recommendation(data: dict):
 
-    prediction = data.get("prediction", "normal")
+    prediction = data.get(
+        "prediction",
+        "normal"
+    )
 
     if prediction == "malicious":
 
         return {
             "security_score": 15,
             "severity": "Critical",
-            "root_cause": "Abnormal CPU and memory consumption consistent with crypto-mining behaviour.",
-            "impact": "Cluster performance degradation and possible resource hijacking.",
+            "root_cause":
+            "Crypto miner behavior detected. High CPU and memory usage observed.",
+
+            "impact":
+            "Potential resource hijacking and workload degradation.",
+
             "actions": [
                 "Isolate affected pod",
                 "Restart workload",
                 "Scan container image",
                 "Review RBAC permissions",
-                "Notify security team"
+                "Notify Security Team"
             ]
         }
 
     return {
         "security_score": 92,
         "severity": "Low",
-        "root_cause": "No malicious indicators detected.",
-        "impact": "No immediate impact.",
+        "root_cause":
+        "No malicious indicators detected.",
+
+        "impact":
+        "No impact.",
+
         "actions": [
-            "Continue monitoring",
-            "Review metrics periodically"
+            "Continue Monitoring",
+            "Review Metrics Periodically"
         ]
     }
