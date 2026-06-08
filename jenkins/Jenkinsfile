@@ -1,1 +1,119 @@
-# Placeholder
+pipeline {
+
+agent any
+
+environment {
+    BACKEND_IMAGE = "kubeguardian-backend"
+    FRONTEND_IMAGE = "kubeguardian-frontend"
+    ECR_REGISTRY = "093435167670.dkr.ecr.ap-southeast-1.amazonaws.com"
+    AWS_REGION = "ap-southeast-1"
+    BUILD_TAG = "${BUILD_NUMBER}"
+}
+
+stages {
+
+    stage('Checkout') {
+        steps {
+            git(
+                url: 'https://github.com/centurion-ck/testv2.git',
+                branch: 'master'
+            )
+        }
+    }
+
+    stage('Train ML Model') {
+        steps {
+            sh '''
+            set -e
+            export MLFLOW_ALLOW_FILE_STORE=true
+            cd ml-service
+            rm -rf venv
+            python3 -m venv venv
+            venv/bin/pip install --upgrade pip
+            venv/bin/pip install -r requirements.txt
+            venv/bin/python train.py
+            '''
+        }
+    }
+
+    stage('Verify Model') {
+        steps {
+            sh '''
+            cd ml-service
+            ls -ltr
+            test -f model.pkl
+            test -f encoder.pkl
+            echo "Model verification successful"
+            '''
+        }
+    }
+
+    stage('Build Backend Image') {
+        steps {
+            sh '''
+            docker build -t ${BACKEND_IMAGE}:${BUILD_TAG} backend
+            '''
+        }
+    }
+
+    stage('Build Frontend Image') {
+        steps {
+            sh '''
+            docker build -t ${FRONTEND_IMAGE}:${BUILD_TAG} frontend
+            '''
+        }
+    }
+
+    stage('ECR Login') {
+        steps {
+            sh '''
+            aws ecr get-login-password --region ${AWS_REGION} | \
+            docker login --username AWS --password-stdin ${ECR_REGISTRY}
+            '''
+        }
+    }
+
+    stage('Tag Images') {
+        steps {
+            sh '''
+            docker tag ${BACKEND_IMAGE}:${BUILD_TAG} ${ECR_REGISTRY}/${BACKEND_IMAGE}:${BUILD_TAG}
+            docker tag ${FRONTEND_IMAGE}:${BUILD_TAG} ${ECR_REGISTRY}/${FRONTEND_IMAGE}:${BUILD_TAG}
+            '''
+        }
+    }
+
+    stage('Push Images') {
+        steps {
+            sh '''
+            docker push ${ECR_REGISTRY}/${BACKEND_IMAGE}:${BUILD_TAG}
+            docker push ${ECR_REGISTRY}/${FRONTEND_IMAGE}:${BUILD_TAG}
+            '''
+        }
+    }
+
+    stage('Deploy with Docker Compose') {
+        steps {
+            sh '''
+            docker compose down || true
+            docker compose pull
+            docker compose up -d
+            '''
+        }
+    }
+}   // ✅ THIS WAS MISSING (closes stages block)
+
+post {
+    success {
+        echo 'KubeGuardian deployment successful'
+    }
+
+    failure {
+        echo 'Pipeline failed'
+    }
+
+    always {
+        sh 'docker system prune -f || true'
+    }
+}
+
+}
