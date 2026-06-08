@@ -1,1 +1,4 @@
-# Placeholder
+pandas
+numpy
+scikit-learn
+joblib
